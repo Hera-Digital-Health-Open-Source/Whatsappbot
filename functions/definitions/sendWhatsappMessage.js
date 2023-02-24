@@ -169,7 +169,7 @@ async function callWhatsappSendMessageApi(data, bot) {
     const response = await axios({
         method: "POST", // Required, HTTP method, a string, e.g. POST, GET
         url:
-            `https://graph.facebook.com/${graphApiVersion.value()}/` +
+            `https://whatsapp.turn.io/v1/messages` +
             phoneNumberId +
             "/messages",
         data: data,
