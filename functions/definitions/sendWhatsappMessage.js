@@ -54,8 +54,6 @@ async function sendWhatsappButtonMessage(to, text, buttons) {
 
 async function callWhatsappSendMessageApi(data) {
     const token = process.env.TURNIO_TOKEN;
-    // console.log(token)
-    // console.log(JSON.stringify(data, null, 2));
     const response = await axios({
         method: "POST", // Required, HTTP method, a string, e.g. POST, GET
         url: `https://whatsapp.turn.io/v1/messages`,

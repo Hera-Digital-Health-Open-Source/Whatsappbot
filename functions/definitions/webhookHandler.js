@@ -102,10 +102,9 @@ async function updateField(to, textOrLoc, docSnap) {
       }
       break;
     default:
-      updateValue = textOrLoc;
+      updateValue = textOrLoc.toUpperCase();
       break;
   }
-  console.log(hasError);
   if (hasError) {
     await sendWhatsappTextMessage(to, MESSAGES.ERROR_MSG);
     return;
