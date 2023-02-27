@@ -19,7 +19,7 @@ app.get("/", async (req, res) => {
   const db = admin.firestore();
   const today = new Date();
   today.setHours(0, 0, 0, 0) //dont care about the hours, compare date only
-  let query = db.collection("facilities").where('expiry', "<=", today).where('inEdit', '==', false);
+  let query = db.collection("facilities").where('expiry', ">=", today).where('inEdit', '==', false);
   if (typeCode) {
     if (!isNaN(typeCode) && parseInt(typeCode) >= 1 && parseInt(typeCode) <= SELECTIONS.length) {
       try {
