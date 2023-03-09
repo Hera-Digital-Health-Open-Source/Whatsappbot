@@ -135,7 +135,7 @@ async function updateField(to, textOrLoc, docSnap) {
         title: "Back / Geri / رجوع",
       }
     }];
-    await sendWhatsappButtonMessage(to, `Confirm ${updateField}: ${updateField === "expiry" ? textOrLoc : updateValue}`, buttons)
+    await sendWhatsappButtonMessage(to, `Confirm ${updateField}: ${updateField === "expiry" ? updateValue.toDate().toDateString() : updateValue}`, buttons)
   }
 };
 
