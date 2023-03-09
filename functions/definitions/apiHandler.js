@@ -56,6 +56,7 @@ app.get("/", async (req, res) => {
       return acc;
     }, {});
   });
+  res.set('Access-Control-Allow-Origin', '*');
   res.status(200).json(returnArray)
 });
 
