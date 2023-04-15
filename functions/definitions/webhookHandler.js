@@ -3,7 +3,7 @@ const admin = require('firebase-admin');
 const express = require('express');
 const { MESSAGES, SELECTIONS } = require("./constants")
 const { defineString } = require('firebase-functions/params');
-const { sendWhatsappTextMessage, sendWhatsappButtonMessage, sendWhatsappTextListMessage } = require('./sendWhatsappMessage')
+const { sendWhatsappTextMessage, sendWhatsappButtonMessage } = require('./sendWhatsappMessage')
 const { QUESTIONS, getFieldByIndex, getNextField, getPreviousField, getFieldIndex } = require('./messageCombos')
 const { getDateFromDDMMYYYY } = require('./utils')
 const { Timestamp } = require('firebase-admin/firestore');
@@ -161,6 +161,6 @@ async function onButton(to, buttonId, docSnap) {
 
 exports.webhookHandler = functions
   .region('europe-central2')
-  .runWith({ secrets: ["TURNIO_TOKEN"] })
+  .runWith({ secrets: ["WHATSAPP_TOKEN", "WHATSAPP_PHONE_NUMBER_ID"] })
   .https.onRequest(app);
 

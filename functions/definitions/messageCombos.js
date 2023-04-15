@@ -1,4 +1,4 @@
-const { sendWhatsappTextMessage, sendWhatsappButtonMessage, sendWhatsappTextListMessage } = require('./sendWhatsappMessage')
+const { sendWhatsappTextMessage, sendWhatsappButtonMessage } = require('./sendWhatsappMessage')
 const { MESSAGES, SELECTIONS } = require("./constants")
 const { sleep } = require('./utils');
 const admin = require('firebase-admin');
