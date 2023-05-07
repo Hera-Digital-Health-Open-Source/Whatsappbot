@@ -17,34 +17,46 @@ const app = express();
 
 // Accepts POST requests at /webhook endpoint
 app.post("/whatsapp", async (req, res) => {
-  if (req.body) {
+  if (req.body.object) {
     if (
-      req.body.messages
+      req.body.entry &&
+      req.body.entry[0].changes &&
+      req.body.entry[0].changes[0] &&
+      req.body.entry[0].changes[0].value.messages &&
+      req.body.entry[0].changes[0].value.messages[0]
     ) {
-      let message = req.body.messages[0];
+      let value = req.body.entry[0].changes[0].value
+      let phoneNumberId = value.metadata.phone_number_id;
+      let message = value.messages[0];
       let from = message.from; // extract the phone number from the webhook payload
       let type = message.type;
 
-      const db = admin.firestore();
+      if (phoneNumberId === process.env.WHATSAPP_PHONE_NUMBER_ID) {
+        const db = admin.firestore();
 
-      const querySnap = await db.collection("facilities").where("inEdit", "==", true).where("user", "==", `${from}`).get();
+        const querySnap = await db.collection("facilities").where("inEdit", "==", true).where("user", "==", `${from}`).get();
 
-      if (querySnap.empty) {
-        await welcome(from);
-      } else {
-        const docSnap = querySnap.docs[0];
-        switch (type) {
-          case "text":
-            await updateField(from, message.text.body, docSnap);
-            break;
-          case "interactive":
-            await onButton(from, message.interactive.button_reply.id, docSnap);
-            break;
-          case "location":
-            await updateField(from, message.location, docSnap);
+        if (querySnap.empty) {
+          await welcome(from);
+        } else {
+          const docSnap = querySnap.docs[0];
+          switch (type) {
+            case "text":
+              await updateField(from, message.text.body, docSnap);
+              break;
+            case "interactive":
+              await onButton(from, message.interactive.button_reply.id, docSnap);
+              break;
+            case "location":
+              await updateField(from, message.location, docSnap);
+          }
         }
+        res.sendStatus(200);
       }
-      res.sendStatus(200);
+      else {
+        functions.logger.log("Received message from unknown phone number");
+        res.sendStatus(200);
+      }
     }
     else {
       res.sendStatus(200); //unexpected message type, could be status update
@@ -52,6 +64,31 @@ app.post("/whatsapp", async (req, res) => {
   } else {
     // Return a '404 Not Found' if event is not from a WhatsApp API
     res.sendStatus(404);
+  }
+});
+
+app.get("/whatsapp", (req, res) => {
+  /**
+     * UPDATE YOUR VERIFY TOKEN
+     *This will be the Verify Token value when you set up webhook
+    **/
+  const verifyToken = process.env.VERIFY_TOKEN;
+  // Parse params from the webhook verification request
+  const mode = req.query["hub.mode"];
+  const token = req.query["hub.verify_token"];
+  const challenge = req.query["hub.challenge"];
+
+  // Check if a token and mode were sent
+  if (mode && token) {
+    // Check the mode and token sent are correct
+    if (mode === "subscribe" && token === verifyToken) {
+      // Respond with 200 OK and challenge token from the request
+      functions.logger.log("WEBHOOK_VERIFIED");
+      res.status(200).send(challenge);
+    } else {
+      // Responds with '403 Forbidden' if verify tokens do not match
+      res.sendStatus(403);
+    }
   }
 });
 
